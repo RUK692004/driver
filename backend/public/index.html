@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BusBee Admin Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+    }
+    .header h1 { font-size: 20px; color: #60a5fa; }
+    .header .user-info { display: flex; align-items: center; gap: 12px; }
+    .header .user-info span { color: #94a3b8; font-size: 14px; }
+    .btn-logout {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-logout:hover { background: #dc2626; }
+
+    /* Login */
+    .login-box {
+      max-width: 400px;
+      margin: 100px auto;
+      background: #1e293b;
+      padding: 32px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    .login-box h2 { text-align: center; margin-bottom: 24px; color: #60a5fa; }
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      font-size: 14px;
+    }
+    .login-box input:focus { outline: none; border-color: #60a5fa; }
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .login-box button:hover { background: #2563eb; }
+    .login-error { color: #f87171; text-align: center; margin-bottom: 12px; font-size: 14px; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 10px 20px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .tab:hover { background: #334155; color: #e2e8f0; }
+    .tab.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+
+    /* Cards */
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card h3 { color: #60a5fa; margin-bottom: 16px; font-size: 16px; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; text-align: left; font-size: 13px; }
+    th { background: #334155; color: #94a3b8; font-weight: 600; }
+    tr { border-bottom: 1px solid #334155; }
+    tr:hover { background: #0f172a; }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-green { background: #16a34a; color: white; }
+    .badge-red { background: #dc2626; color: white; }
+    .badge-yellow { background: #d97706; color: white; }
+    .badge-gray { background: #475569; color: white; }
+
+    /* Forms */
+    .form-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .form-row input, .form-row select {
+      flex: 1;
+      min-width: 150px;
+      padding: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      font-size: 14px;
+    }
+    .form-row input:focus, .form-row select:focus { outline: none; border-color: #60a5fa; }
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-success:hover { background: #15803d; }
+    .btn-warning {
+      background: #d97706;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-warning:hover { background: #b45309; }
+
+    .message {
+      padding: 10px 16px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      display: none;
+    }
+    .message.success { background: #16a34a22; color: #4ade80; border: 1px solid #16a34a; }
+    .message.error { background: #ef444422; color: #f87171; border: 1px solid #ef4444; }
+
+    .hidden { display: none; }
+    .empty { text-align: center; color: #64748b; padding: 30px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <h2>🚌 BusBee Admin</h2>
+      <div id="loginError" class="login-error"></div>
+      <input type="email" id="loginEmail" placeholder="Admin Email" autocomplete="email" required>
+      <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
+      <button id="loginButton" type="button">Login</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden">
+    <div class="header">
+      <h1>🚌 BusBee Admin Dashboard</h1>
+      <div class="user-info">
+        <span id="adminName"></span>
+        <button id="logoutButton" class="btn-logout">Logout</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div id="message" class="message"></div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="drivers">Drivers</button>
+        <button class="tab" data-tab="buses">Buses</button>
+        <button class="tab" data-tab="routes">Routes</button>
+        <button class="tab" data-tab="assignments">Assignments</button>
+      </div>
+
+      <!-- Drivers Tab -->
+      <div id="tab-drivers" class="tab-content">
+        <div class="card">
+          <h3>Registered Drivers</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>License</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="driversTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Buses Tab -->
+      <div id="tab-buses" class="tab-content hidden">
+        <div class="card">
+          <h3>Add New Bus</h3>
+          <div class="form-row">
+            <input type="text" id="newBusNumber" placeholder="Bus Number (e.g. KL-01-AB-1234)">
+            <input type="text" id="newBusName" placeholder="Bus Name (e.g. Trivandrum Express)">
+            <select id="newBusType">
+              <option value="STANDARD">Standard</option>
+              <option value="AC">AC</option>
+              <option value="LUXURY">Luxury</option>
+            </select>
+            <input type="number" id="newBusCapacity" placeholder="Capacity" value="40">
+          </div>
+          <button id="createBusButton" class="btn-primary">Add Bus</button>
+        </div>
+        <div class="card">
+          <h3>All Buses</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Number</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th>Assigned Driver</th>
+                <th>Route</th>
+              </tr>
+            </thead>
+            <tbody id="busesTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Routes Tab -->
+      <div id="tab-routes" class="tab-content hidden">
+        <div class="card">
+          <h3>Add New Route</h3>
+          <div class="form-row">
+            <input type="text" id="newRouteName" placeholder="Route Name (e.g. Trivandrum - Kollam)">
+            <input type="text" id="newRouteStart" placeholder="Start Location">
+            <input type="text" id="newRouteEnd" placeholder="End Location">
+          </div>
+          <div class="form-row">
+            <input type="number" id="newStopEta" placeholder="ETA (min)" value="0">
+            <input type="search" id="stopLocationSearch" placeholder="Search for a stop location" aria-label="Search for a stop location">
+            <button id="searchStopButton" class="btn-primary" type="button">Search Map</button>
+          </div>
+          <div id="locationResults" class="empty" aria-live="polite">Search for a location, then select a result to add it as a stop.</div>
+          <iframe id="stopMapPreview" title="Selected stop map preview" class="hidden" style="width:100%;height:250px;border:0;border-radius:10px;margin:12px 0;"></iframe>
+          <div id="stopsList" style="margin-bottom: 12px;"></div>
+          <button id="createRouteButton" class="btn-success" type="button">Create Route</button>
+        </div>
+        <div class="card">
+          <h3>All Routes</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Stops</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="routesTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Assignments Tab -->
+      <div id="tab-assignments" class="tab-content hidden">
+        <div class="card">
+          <h3>Assign Bus to Driver</h3>
+          <div class="form-row">
+            <select id="assignDriver">
+              <option value="">Select Driver</option>
+            </select>
+            <select id="assignBus">
+              <option value="">Select Bus</option>
+            </select>
+            <select id="assignRoute">
+              <option value="">Select Route (optional)</option>
+            </select>
+          </div>
+          <button id="assignBusButton" class="btn-primary">Assign Bus</button>
+        </div>
+        <div class="card">
+          <h3>Current Assignments</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Driver</th>
+                <th>Bus</th>
+                <th>Route</th>
+                <th>Assigned At</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="assignmentsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/admin.js" defer></script>
+  <!-- Legacy inline script retained as a reference only; Helmet CSP intentionally prevents it from executing.
+  <script>
+    const API = window.location.origin + '/api';
+    let token = localStorage.getItem('admin_token');
+    let stopsList = [];
+
+    // ---- Auth ----
+    async function login() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errorEl = document.getElementById('loginError');
+      const button = document.getElementById('loginButton');
+      errorEl.textContent = '';
+
+      if (!email || !password) {
+        errorEl.textContent = 'Enter your admin email and password.';
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Logging in…';
+
+      try {
+        const res = await fetch(API + '/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errorEl.textContent = data.error || 'Login failed';
+          return;
+        }
+        if (data.user.role !== 'ADMIN') {
+          errorEl.textContent = 'This account is not an admin.';
+          return;
+        }
+        token = data.token;
+        const session = await api('/auth/me');
+        if (session.user.role !== 'ADMIN') {
+          token = null;
+          errorEl.textContent = 'This account is not an admin.';
+          return;
+        }
+        localStorage.setItem('admin_token', token);
+        document.getElementById('adminName').textContent = session.user.name;
+        showDashboard();
+        await loadAll();
+      } catch (e) {
+        token = null;
+        localStorage.removeItem('admin_token');
+        errorEl.textContent = e.message || 'Cannot reach server. Is the backend running?';
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Login';
+      }
+    }
+
+    function logout() {
+      token = null;
+      localStorage.removeItem('admin_token');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+    }
+
+    // ---- API helper ----
+    async function api(path, options = {}) {
+      const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      const res = await fetch(API + path, { ...options, headers });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    }
+
+    // ---- Tabs ----
+    function showTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      document.querySelector(`.tab[onclick="showTab('${name}')"]`).classList.add('active');
+      document.getElementById('tab-' + name).classList.remove('hidden');
+    }
+
+    // ---- Load all data ----
+    async function loadAll() {
+      await Promise.all([loadDrivers(), loadBuses(), loadRoutes(), loadAssignments()]);
+    }
+
+    async function loadDrivers() {
+      try {
+        const data = await api('/admin/drivers');
+        const tbody = document.getElementById('driversTable');
+        tbody.innerHTML = data.drivers.length === 0
+          ? '<tr><td colspan="6" class="empty">No drivers registered yet</td></tr>'
+          : data.drivers.map(d => `
+            <tr>
+              <td>${d.driver_id}</td>
+              <td>${d.name}</td>
+              <td>${d.email}</td>
+              <td>${d.phone || '—'}</td>
+              <td>${d.license_number}</td>
+              <td><span class="badge ${d.driver_status === 'ACTIVE' ? 'badge-green' : 'badge-red'}">${d.driver_status}</span></td>
+            </tr>
+          `).join('');
+      } catch (e) { showMessage(e.message, 'error'); }
+    }
+
+    async function loadBuses() {
+      try {
+        const data = await api('/admin/buses');
+        const tbody = document.getElementById('busesTable');
+        tbody.innerHTML = data.buses.length === 0
+          ? '<tr><td colspan="8" class="empty">No buses yet</td></tr>'
+          : data.buses.map(b => `
+            <tr>
+              <td>${b.id}</td>
+              <td>${b.bus_number}</td>
+              <td>${b.bus_name}</td>
+              <td>${b.bus_type}</td>
+              <td>${b.capacity}</td>
+              <td><span class="badge ${b.status === 'ACTIVE' ? 'badge-green' : 'badge-yellow'}">${b.status}</span></td>
+              <td>${b.assigned_driver_name || '—'}</td>
+              <td>${b.route_name || '—'}</td>
+            </tr>
+          `).join('');
+
+        // Populate assign bus dropdown
+        const select = document.getElementById('assignBus');
+        select.innerHTML = '<option value="">Select Bus</option>' + data.buses
+          .filter(b => !b.assigned_driver_name)
+          .map(b => `<option value="${b.id}">${b.bus_number} — ${b.bus_name}</option>`)
+          .join('');
+      } catch (e) { showMessage(e.message, 'error'); }
+    }
+
+    async function loadRoutes() {
+      try {
+        const data = await api('/admin/routes');
+        const tbody = document.getElementById('routesTable');
+        tbody.innerHTML = data.routes.length === 0
+          ? '<tr><td colspan="5" class="empty">No routes yet</td></tr>'
+          : data.routes.map(r => `
+            <tr>
+              <td>${r.id}</td>
+              <td>${r.route_name}</td>
+              <td>${r.start_location}</td>
+              <td>${r.end_location}</td>
+              <td>${r.total_stops}</td>
+            </tr>
+          `).join('');
+
+        const select = document.getElementById('assignRoute');
+        select.innerHTML = '<option value="">Select Route (optional)</option>' + data.routes
+          .map(r => `<option value="${r.id}">${r.route_name}</option>`)
+          .join('');
+      } catch (e) { showMessage(e.message, 'error'); }
+    }
+
+    async function loadAssignments() {
+      try {
+        const data = await api('/admin/assignments');
+        const tbody = document.getElementById('assignmentsTable');
+        tbody.innerHTML = data.assignments.length === 0
+          ? '<tr><td colspan="6" class="empty">No assignments yet</td></tr>'
+          : data.assignments.map(a => `
+            <tr>
+              <td>${a.id}</td>
+              <td>${a.driver_name} (${a.driver_email})</td>
+              <td>${a.bus_number} — ${a.bus_name}</td>
+              <td>${a.route_name || '—'}</td>
+              <td>${new Date(a.assigned_at).toLocaleString()}</td>
+              <td><button class="btn-danger" onclick="removeAssignment(${a.id})">Remove</button></td>
+            </tr>
+          `).join('');
+
+        // Populate driver dropdown
+        const drivers = await api('/admin/drivers');
+        const select = document.getElementById('assignDriver');
+        select.innerHTML = '<option value="">Select Driver</option>' + drivers.drivers
+          .map(d => `<option value="${d.driver_id}">${d.name} (${d.email})</option>`)
+          .join('');
+      } catch (e) { showMessage(e.message, 'error'); }
+    }
+
+    // ---- Actions ----
+    async function createBus() {
+      const bus_number = document.getElementById('newBusNumber').value.trim();
+      const bus_name = document.getElementById('newBusName').value.trim();
+      const bus_type = document.getElementById('newBusType').value;
+      const capacity = parseInt(document.getElementById('newBusCapacity').value) || 40;
+
+      if (!bus_number || !bus_name) {
+        showMessage('Enter bus number and name', 'error');
+        return;
+      }
+
+      try {
+        await api('/admin/buses', {
+          method: 'POST',
+          body: JSON.stringify({ bus_number, bus_name, bus_type, capacity }),
+        });
+        showMessage('Bus created successfully', 'success');
+        document.getElementById('newBusNumber').value = '';
+        document.getElementById('newBusName').value = '';
+        await loadBuses();
+      } catch (e) { showMessage(e.message, 'error'); }
+    }
+
+    function addStopToList() {
+      const name = document.getElementById('newStopName').value.trim();
+      const lat = parseFloat(document.getElementById('newStopLat').value);
+      const lng = parseFloat(document.getElementById('newStopLng').value);
+      const eta = parseInt(document.getElementById('newStopEta').value) || 0;
+
+      if (!name || isNaN(lat) || isNaN(lng)) {
+        showMessage('Enter stop name, latitude and longitude', 'error');
+        return;
+      }
+
+      stopsList.push({ stop_name: name, latitude: lat, longitude: lng, eta_minutes: eta });
+      document.getElementById('stopsList').innerHTML = stopsList.map((s, i) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #334155;">
+          <span>${i + 1}. ${s.stop_name} (${s.latitude}, ${s.longitude})</span>
+          <button class="btn-danger" onclick="removeStopFromList(${i})">✕</button>
+        </div>
+      `).join('');
+
+      document.getElementById('newStopName').value = '';
+      document.getElementById('newStopLat').value = '';
+      document.getElementById('newStopLng').value = '';
+      document.getElementById('newStopEta').value = '0';
+    }
+
+    function removeStopFromList(index) {
+      stopsList.splice(index, 1);
+      document.getElementById('stopsList').innerHTML = stopsList.map((s, i) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #334155;">
+          <span>${i + 1}. ${s.stop_name} (${s.latitude}, ${s.longitude})</span>
+          <button class="btn-danger" onclick="removeStopFromList(${i})">✕</button>
+        </div>
+      `).join('');
+    }
+
+    async function createRoute() {
+      const route_name = document.getElementById('newRouteName').value.trim();
+      const start_location = document.getElementById('newRouteStart').value.trim();
+      const end_location = document.getElementById('newRouteEnd').value.trim();
+
+      if (!route_name || !start_location || !end_location) {
+        showMessage('Enter route name, start and end locations', 'error');
+        return;
+      }
+
+      try {
+        await api('/admin/routes', {
+          method: 'POST',
+          body: JSON.stringify({ route_name, start_location, end_location, stops: stopsList }),
+        });
+        showMessage('Route created successfully', 'success');
+        document.getElementById('newRouteName').value = '';
+        document.getElementById('newRouteStart').value = '';
+        document.getElementById('newRouteEnd').value = '';
+        stopsList = [];
+        document.getElementById('stopsList').innerHTML = '';
+        await loadRoutes();
+      } catch (e) { showMessage(e.message, 'error'); }
+    }
+
+    async function assignBus() {
+      const driver_id = parseInt(document.getElementById('assignDriver').value);
+      const bus_id = parseInt(document.getElementById('assignBus').value);
+      const route_id = document.getElementById('assignRoute').value
+        ? parseInt(document.getElementById('assignRoute').value)
+        : null;
+
+      if (!driver_id || !bus_id) {
+        showMessage('Select a driver and a bus', 'error');
+        return;
+      }
+
+      try {
+        await api('/admin/assign', {
+          method: 'POST',
+          body: JSON.stringify({ driver_id, bus_id, route_id }),
+        });
+        showMessage('Bus assigned to driver successfully', 'success');
+        await Promise.all([loadBuses(), loadAssignments()]);
+      } catch (e) { showMessage(e.message, 'error'); }
+    }
+
+    async function removeAssignment(id) {
+      if (!confirm('Remove this assignment?')) return;
+      try {
+        await api('/admin/assignments/' + id, { method: 'DELETE' });
+        showMessage('Assignment removed', 'success');
+        await Promise.all([loadBuses(), loadAssignments()]);
+      } catch (e) { showMessage(e.message, 'error'); }
+    }
+
+    // ---- UI helpers ----
+    function showMessage(text, type) {
+      const el = document.getElementById('message');
+      el.textContent = text;
+      el.className = 'message ' + type;
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 4000);
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+    }
+
+    document.getElementById('loginPassword').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') login();
+    });
+
+    // ---- Init ----
+    (async function init() {
+      if (token) {
+        try {
+          const data = await api('/auth/me');
+          if (data.user.role === 'ADMIN') {
+            document.getElementById('adminName').textContent = data.user.name;
+            showDashboard();
+            loadAll();
+            return;
+          }
+        } catch (e) {
+          // Token invalid, show login
+        }
+        logout();
+      }
+    })();
+  </script>
+  -->
+</body>
+</html>
